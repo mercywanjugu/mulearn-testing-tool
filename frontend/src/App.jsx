@@ -6,6 +6,23 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // 🌟 NEW FUNCTIONALITY (Post-Oct 24): Automatic extension detection
+  const detectLanguage = (filename) => {
+    if (!filename) return null;
+    const ext = filename.split('.').pop().toLowerCase();
+    if (ext === 'cpp' || ext === 'h') return '⚡ C++ (g++ Execution Mode)';
+    if (ext === 'py') return '🐍 Python (unittest Execution Mode)';
+    if (ext === 'java') return '☕ Java (JUnit Execution Mode)';
+    return '📄 Text Document';
+  };
+
+  // 🌟 NEW FUNCTIONALITY (Post-Oct 24): Clean reset workspace handler
+  const resetForm = () => {
+    setCodeFile(null);
+    setTestFile(null);
+    setResult(null);
+  };
+
   const handleRunMutation = async (e) => {
     e.preventDefault();
     if (!codeFile || !testFile) {
@@ -55,7 +72,11 @@ function App() {
           />
           {codeFile && (
             <div style={{ marginTop: '8px', color: '#34D399', fontSize: '14px', fontWeight: '500' }}>
-              ✓ Selected: <span style={{ color: '#F3F4F6', textDecoration: 'underline' }}>{codeFile.name}</span>
+              ✓ Selected: <span style={{ color: '#F3F4F6' }}>{codeFile.name}</span>
+              {/* 🌟 Visual Progress Indicator */}
+              <div style={{ color: '#818CF8', fontSize: '12px', marginTop: '4px', fontWeight: 'bold' }}>
+                Detected: {detectLanguage(codeFile.name)}
+              </div>
             </div>
           )}
         </div>
@@ -73,28 +94,52 @@ function App() {
           />
           {testFile && (
             <div style={{ marginTop: '8px', color: '#34D399', fontSize: '14px', fontWeight: '500' }}>
-              ✓ Selected: <span style={{ color: '#F3F4F6', textDecoration: 'underline' }}>{testFile.name}</span>
+              ✓ Selected: <span style={{ color: '#F3F4F6' }}>{testFile.name}</span>
+              <div style={{ color: '#818CF8', fontSize: '12px', marginTop: '4px', fontWeight: 'bold' }}>
+                Detected: {detectLanguage(testFile.name)}
+              </div>
             </div>
           )}
         </div>
 
-        <button 
-          type="submit" 
-          disabled={loading}
-          style={{
-            padding: '12px',
-            backgroundColor: loading ? '#4B5563' : '#6366F1',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            fontWeight: 'bold',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontSize: '16px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-          }}
-        >
-          {loading ? "Running Mutation Testing Engine..." : "⚡ Run Mutation Analysis"}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{
+              flex: 3,
+              padding: '12px',
+              backgroundColor: loading ? '#4B5563' : '#6366F1',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            {loading ? "Running Mutation Testing Engine..." : "⚡ Run Mutation Analysis"}
+          </button>
+
+          {/* 🌟 New Reset Control Button */}
+          <button 
+            type="button"
+            onClick={resetForm}
+            style={{
+              flex: 1,
+              padding: '12px',
+              backgroundColor: '#374151',
+              color: '#D1D5DB',
+              border: '1px solid #4B5563',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            🔄 Reset
+          </button>
+        </div>
       </form>
 
       {result && (
